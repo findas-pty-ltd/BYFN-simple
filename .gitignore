@@ -11,7 +11,7 @@
 !byfn-simple.sh
 
 # ...even if they are in subdirectories
-#!*/
+!*/
 
 # if the files to be tracked are in subdirectories
 !*bin/configtxgen

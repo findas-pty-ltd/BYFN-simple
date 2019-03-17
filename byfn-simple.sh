@@ -3,7 +3,7 @@
 
 export PATH=${PWD}/bin:${PWD}:$PATH
 export FABRIC_CFG_PATH=${PWD}
-export VERBOSE=false
+
 
 
 # sources the default configs
@@ -15,11 +15,75 @@ function clean(){
   rm -rf ./crypto-config
 }
 
-## High Detail
+## Prints the help menu
+function help(){
+  echo 
+  echo " ################################# "
+  echo "             BYFN Simple           "
+  echo " ################################# "
+  echo 
+  echo " ## High Detail Functions ## "
+  echo "  ## Cert Generation # "
+  echo "  # > create_certs "
+  echo "  # > inject_keys "
+  echo "  #"
+  echo "  ## Artifact Generation # "
+  echo "  # > create_channel_artifact "
+  echo "  # > create_genesisblock_artifact "
+  echo "  # > create_organisation_artifact "
+  echo 
+  echo " ## Medium Detail Functions ## "
+  echo "  # > generate_certs "
+  echo "  # > generate_artifacts "
+  echo "  # > boot_containers "
+  echo "  # > run_inner_script "
+  echo 
+  echo " ## Low Deatil Functions ## "
+  echo "  # > up "
+  echo "  # > down "
+  echo 
+  echo " To view what arguments to pars check the function header"
+  echo " inside the ./byfn.sh file"
+  echo 
+}
+
+function checkPrereqs() {
+  # Note, we check configtxlator externally because it does not require a config file, and peer in the
+  # docker image because of FAB-8551 that makes configtxlator return 'development version' in docker
+  LOCAL_VERSION=$(configtxlator version | sed -ne 's/ Version: //p')
+  DOCKER_IMAGE_VERSION=$(docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version | sed -ne 's/ Version: //p' | head -1)
+
+  echo "LOCAL_VERSION=$LOCAL_VERSION"
+  echo "DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
+
+  if [ "$LOCAL_VERSION" != "$DOCKER_IMAGE_VERSION" ]; then
+    echo "=================== WARNING ==================="
+    echo "  Local fabric binaries and docker images are  "
+    echo "  out of  sync. This may cause problems.       "
+    echo "==============================================="
+  fi
+
+  for UNSUPPORTED_VERSION in $BLACKLISTED_VERSIONS; do
+    echo "$LOCAL_VERSION" | grep -q $UNSUPPORTED_VERSION
+    if [ $? -eq 0 ]; then
+      echo "ERROR! Local Fabric binary version of $LOCAL_VERSION does not match this newer version of BYFN and is unsupported. Either move to a later version of Fabric or checkout an earlier version of fabric-samples."
+      exit 1
+    fi
+
+    echo "$DOCKER_IMAGE_VERSION" | grep -q $UNSUPPORTED_VERSION
+    if [ $? -eq 0 ]; then
+      echo "ERROR! Fabric Docker image version of $DOCKER_IMAGE_VERSION does not match this newer version of BYFN and is unsupported. Either move to a later version of Fabric or checkout an earlier version of fabric-samples."
+      exit 1
+    fi
+  done
+}
+
 
 ##################################################
-###               Cert Generation              ###
+###                 High Detail                ###
 ##################################################
+
+###_______________Cert_Generation______________###
 
 # This function will create the certifications for the different orgs from the crypto-config.yaml
 # This function automaticly creates the crypto-config folder
@@ -50,9 +114,9 @@ function create_certs(){
 }
 
 
+# This function takes the generated certs and adds the key to the given CA's yaml file
 CA1_PRIVATE_KEY=""
 CA2_PRIVATE_KEY=""
-# This function takes the generated certs and adds the key to the given CA's yaml file
 function inject_keys(){
   # sed on MacOSX does not support -i flag with a null extension. We will use
   # 't' for our back-up's extension and delete it at the end of the function
@@ -84,13 +148,11 @@ function inject_keys(){
 }
 
 
-##################################################
-###             Artifact Generation            ###
-##################################################
+###_____________Artifact_Generation____________###
 
 # This function will create a channel artifact
-# $1: ^String -> Channel Name | default $CHANNEL_NAME
-# $2: ^String -> Output file of the channel file  | default $ARTIFACT_DEFAULT/channel.tx
+# $1: ^String -> Output file of the channel file  | default $ARTIFACT_DEFAULT/channel.tx
+# $2: ^String -> Channel Name | default $CHANNEL_NAME
 # $3: ^String -> profile to use for the genesis generation pulled from the configtx.yaml | default TwoOrgsChannel  
 function create_channel_artifact(){
   which configtxgen
@@ -98,13 +160,13 @@ function create_channel_artifact(){
     echo "configtxgen tool not found. exiting"
     exit 1
   fi
-  mkdir -p $(dirname ${2:-$ARTIFACT_DEFAULT/channel.tx})
+  mkdir -p $(dirname ${1:-$ARTIFACT_DEFAULT/channel.tx})
   echo
   echo "#################################################################"
   echo "### Generating channel configuration transaction 'channel.tx' ###"
   echo "#################################################################"
   set -x
-  configtxgen -profile ${3:-TwoOrgsChannel} -outputCreateChannelTx ${2:-$ARTIFACT_DEFAULT/channel.tx} -channelID ${1:-$CHANNEL_NAME}
+  configtxgen -profile ${3:-TwoOrgsChannel} -outputCreateChannelTx ${1:-$ARTIFACT_DEFAULT/channel.tx} -channelID ${2:-$CHANNEL_NAME}
   
   res=$?
   set +x
@@ -170,44 +232,63 @@ function create_organisation_artifact(){
 
 
 
-## Medium Detail
+##################################################
+###               Medium Detail                ###
+##################################################
 
+# This function run eash of the funtion required for generate the Peer and Orderer Certs
 function generate_certs(){
     create_certs
     inject_keys
 }
 
+# This function will create all the required atifacts for the byfn-simple network
 function generate_artifacts(){
-    create_channel_artifact $CHANNEL_NAME $ARTIFACT_DEFAULT/channel.tx TwoOrgsChannel
+    create_channel_artifact $ARTIFACT_DEFAULT/channel.tx $CHANNEL_NAME TwoOrgsChannel
     create_genesisblock_artifact $ARTIFACT_DEFAULT $CHANNEL_NAME TwoOrgsOrdererGenesis
     create_organisation_artifact Org1MSP $ARTIFACT_DEFAULT $CHANNEL_NAME TwoOrgsChannel
     create_organisation_artifact Org2MSP $ARTIFACT_DEFAULT $CHANNEL_NAME TwoOrgsChannel
 }
 
+# This function will boot all the containers in the docker-compose.yaml file
 function boot_containers(){
     echo boot_containers
     IMAGE_TAG=$IMAGETAG \
     COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME \
     CA1_PRIVATE_KEY=$CA1_PRIVATE_KEY \
     CA2_PRIVATE_KEY=$CA2_PRIVATE_KEY \
+    ARTIFACT_DEFAULT=$ARTIFACT_DEFAULT \
     docker-compose -f $COMPOSE_FILE up -d 2>&1
 }
 
+# This function will connect to the CLI container and run the ./scripts/script.sh 
+# which will then set up the network with the generated config
 function run_inner_script(){
-  docker exec cli scripts/script.sh start_network $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE 2>&1
+  docker exec cli scripts/build-network.sh start 2>&1
 }
 
 
+##################################################
+###                  Low Detail                ###
+##################################################
 
-## Low Detail
-
+# This function will execute the following steps:
+# Step 1: checks that you have correct prerequisites and versions installed
+# Step 2: generate the certs and artifacts
+# Step 3: boot the containers
+# Step 4: configure the network
 function up(){
+    checkPrereqs
     generate_certs
     generate_artifacts
     boot_containers
     run_inner_script
 }
 
+# This function will execute the following steps:
+# Step 1: bring down the containers
+# Step 2: clean the container images
+# Step 3: rm any generated files
 function down(){
     echo down
     # stop org3 containers also in addition to org1 and org2, in case we were running sample to add org3
@@ -216,6 +297,7 @@ function down(){
     COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME \
     CA1_PRIVATE_KEY=$CA1_PRIVATE_KEY \
     CA2_PRIVATE_KEY=$CA2_PRIVATE_KEY \
+    ARTIFACT_DEFAULT=$ARTIFACT_DEFAULT \
     docker-compose -f $COMPOSE_FILE down --volumes --remove-orphans
     # Bring down the network, deleting the volumes
     #Delete any ledger backups
@@ -239,36 +321,6 @@ function down(){
     
 }
 
-function help(){
-  echo 
-  echo " ################################# "
-  echo "             BYFN Simple           "
-  echo " ################################# "
-  echo 
-  echo " ## High Detail Functions ## "
-  echo "  ## Cert Generation # "
-  echo "  # > create_certs "
-  echo "  # > inject_keys "
-  echo "  #"
-  echo "  ## Artifact Generation # "
-  echo "  # > create_channel_artifact "
-  echo "  # > create_genesisblock_artifact "
-  echo "  # > create_organisation_artifact "
-  echo 
-  echo " ## Medium Detail Functions ## "
-  echo "  # > generate_certs "
-  echo "  # > generate_artifacts "
-  echo "  # > boot_containers "
-  echo "  # > run_inner_script "
-  echo 
-  echo " ## Low Deatil Functions ## "
-  echo "  # > up "
-  echo "  # > down "
-  echo 
-  echo " To view what arguments to pars check the function header"
-  echo " inside the ./byfn.sh file"
-  echo 
-}
 
 eval "$@"
 

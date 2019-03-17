@@ -1,4 +1,4 @@
-# BYFN-simple
+# byfn-simple
 
 This repository aims to reduce the Hyperledger Fabric "Build Your First Netowrk" exmaple down to its simplest form.
 
@@ -11,7 +11,7 @@ This repository aims to reduce the Hyperledger Fabric "Build Your First Netowrk"
     - Network tapolagy, is used for generaing certificates and permissions for each entity in the network.
 - docker-compose.yaml
     - used for brining up containers (cli, orderer, peers, ca).
-- BYFN.sh
+- byfn-simple.sh
     - The script containing all the required commands to build and run the network.
 
 # Steps
@@ -31,21 +31,20 @@ $ which cryptogen
 ### Step 2 Testing
 Run the full byfn to test if the network will boot
 ```sh
-$ ./BYFN.sh up
+$ ./byfn-simple.sh up
 ```
-Once you have Byfn running cleanly through
-Run
+Once you have byfn running cleanly through run
 ```sh
-$ ./BYFN.sh down
-$ ./BYFN.sh clean
+$ ./byfn-simple.sh down
 ```
 
-The following steps will break down what the BYFN script is doing to boot your first network
+The following steps will break down what the byfn script is doing to boot your first network
 
 ### Step 3 Certs
-BYFN starts by looking at the crypto-config.yaml file and generates Organisation certificates for that network structure.
+
+byfn starts by looking at the crypto-config.yaml file and generates Organisation certificates for that network structure.
 ```sh
-$ ./BYFN.sh create_certs x
+$ ./byfn-simple.sh create_certs [crypto-config.yaml path]
 ```
 You sould be able to see a new folder crypto-config which the container will then join volumes with. 
 
@@ -56,22 +55,22 @@ After the certs have been generated we now need to generate the network artifact
 These include:
 - channel MSPs
 - Organisation MSPs
-- Genisiblocks
+- GenisisBlocks
+
+ 
 ```sh
-$ ./BYFN.sh create_channel_artifact x
-$ ./BYFN.sh create_organisation_artifact x
-$ ./BYFN.sh create_genisiblock_artifact x
+$ ./byfn-simple.sh create_channel_artifact [Output File] [Channel Name] [Profile From configtx.yaml]
+$ ./byfn-simple.sh create_organisation_artifact [MSP name] [Output Folder] [Channel Name] [Profile From configtx.yaml] 
+$ ./byfn-simple.sh create_genisiblock_artifact [Output Folder] [Channel Name] [Profile From configtx.yaml]
 ```
-These functions use the repective binnaries
-- x
-- y
-- z
+These functions all use the configtxgen binnary
 
 
 ### Step 5 Booting The Network
+
 Now that we have all the certs and artifacts generated we can boot all the containers for the network.
 ```sh
-$ ./BYFN.sh boot_network x
+$ ./byfn-simple.sh boot_network
 ```
 To check all the containers were created you can run
 ```sh
@@ -80,7 +79,42 @@ $ docker ps
 
 ### Step 6 Configuring the network
 
+To Configure the network you will need to connect to the CLI container by running
+```sh
+$ docker exec -it cli bash
+```
 
+Now that you are in the CLI if you run the `ls` command you should be able to see these folders
+- channel-artifacts  
+- crypto-config
+- chaincode
+- scripts
+
+Now you'll want to setup the channel by running
+```sh
+$ ./scripts/build-network.sh init_channel
+```
+This will create our channel called "mychannel" and join all peers to it.
+Next we'll want set up our Anchor peers so run
+```sh
+$ ./scripts/build-network.sh init_anchors
+```
+This will set peer0 of org1 and peer0 of org2 as our anchor peers.
+And now you'll need to install and instaciate the chaincode by running 
+```sh
+$ ./scripts/build-network.sh init_chaincode
+```
+This will create 2 entities A and B, giving entity A a total of 100 and entity B a total of 200.
+
+
+### Step 7 Testing the network
+
+Now that the network is configured and running, you can test it while connected to the cli container by running
+```sh
+$ ./scripts/test-network.sh test_chaincode
+```
+This will first query peer0 of org1 with an expected response. Next it will run a transaction by sending 10 from A to B.
+Then finally it will query peer1 of org2 to check that the transaction was successful.
 
 ## Prerequisites
 ##### Summary
