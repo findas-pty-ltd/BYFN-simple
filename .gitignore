@@ -1,0 +1,21 @@
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!README.md
+!LICENSE
+!docker-compose.yaml
+!crypto-config.yaml
+!configtx.yaml
+!byfn-simple.sh
+
+# ...even if they are in subdirectories
+#!*/
+
+# if the files to be tracked are in subdirectories
+!*bin/configtxgen
+!*bin/cryptogen
+!*scripts/script.sh
+!*scripts/bash-settings.cfg
+!*.go
