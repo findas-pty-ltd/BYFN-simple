@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-#export PATH=${PWD}/bin:${PWD}:$PATH
+export PATH=${PWD}/bin:${PWD}:$PATH
 export FABRIC_CFG_PATH=${PWD}
 export VERBOSE=false
 
@@ -82,34 +82,6 @@ function inject_keys(){
     rm docker-compose.yamlt
   fi
 }
-
-
-# original
-function generateCerts() {
-  which cryptogen
-  if [ "$?" -ne 0 ]; then
-    echo "cryptogen tool not found. exiting"
-    exit 1
-  fi
-  echo
-  echo "##########################################################"
-  echo "##### Generate certificates using cryptogen tool #########"
-  echo "##########################################################"
-
-  if [ -d "crypto-config" ]; then
-    rm -Rf crypto-config
-  fi
-  set -x
-  cryptogen generate --config=./crypto-config.yaml
-  res=$?
-  set +x
-  if [ $res -ne 0 ]; then
-    echo "Failed to generate certificates..."
-    exit 1
-  fi
-  echo
-}
-
 
 
 ##################################################
@@ -196,89 +168,6 @@ function create_organisation_artifact(){
   fi
 }
 
-# original 
-function generateChannelArtifacts() {
-  which configtxgen
-  if [ "$?" -ne 0 ]; then
-    echo "configtxgen tool not found. exiting"
-    exit 1
-  fi
-  
-  mkdir -p $ARTIFACT_DEFAULT
-  
-  if [ ${1:-1} -eq 1 ] ; then 
-    echo "##########################################################"
-    echo "#########  Generating Orderer Genesis block ##############"
-    echo "##########################################################"
-    # Note: For some unknown reason (at least for now) the block file can't be
-    # named orderer.genesis.block or the orderer will fail to launch!
-    set -x
-    configtxgen -profile TwoOrgsOrdererGenesis -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-      echo "Failed to generate orderer genesis block..."
-      exit 1
-    fi
-  else
-    create_genesisblock_artifact $ARTIFACT_DEFAULT $CHANNEL_NAME TwoOrgsOrdererGenesis
-  fi  
-  
-  if [ ${2:-1} -eq 1 ] ; then 
-    echo
-    echo "#################################################################"
-    echo "### Generating channel configuration transaction 'channel.tx' ###"
-    echo "#################################################################"
-    set -x
-    configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID $CHANNEL_NAME
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-      echo "Failed to generate channel configuration transaction..."
-      exit 1
-    fi
-  else
-    create_channel_artifact $CHANNEL_NAME $ARTIFACT_DEFAULT/channel.tx TwoOrgsChannel
-  fi
-  
-  if [ ${3:-1} -eq 1 ] ; then 
-    echo
-    echo "#################################################################"
-    echo "#######    Generating anchor peer update for Org1MSP   ##########"
-    echo "#################################################################"
-    set -x
-    configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org1MSP
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-      echo "Failed to generate anchor peer update for Org1MSP..."
-      exit 1
-    fi
-  else
-    create_organisation_artifact Org1MSP $ARTIFACT_DEFAULT $CHANNEL_NAME TwoOrgsChannel
-  fi
-  
-  if [ ${4:-1} -eq 1 ] ; then 
-    echo
-    echo "#################################################################"
-    echo "#######    Generating anchor peer update for Org2MSP   ##########"
-    echo "#################################################################"
-    set -x
-    configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate \
-      ./channel-artifacts/Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org2MSP
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-      echo "Failed to generate anchor peer update for Org2MSP..."
-      exit 1
-    fi
-  else
-    create_organisation_artifact Org2MSP $ARTIFACT_DEFAULT $CHANNEL_NAME TwoOrgsChannel
-  fi
-  echo
-}
-
-
 
 
 ## Medium Detail
@@ -315,14 +204,6 @@ function run_inner_script(){
 function up(){
     generate_certs
     generate_artifacts
-    boot_containers
-    run_inner_script
-}
-function up_test(){
-    #generate_certs
-    generateCerts
-    #generate_artifacts
-    generateChannelArtifacts 0 0 0 0
     boot_containers
     run_inner_script
 }
