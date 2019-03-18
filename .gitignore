@@ -3,7 +3,7 @@
 
 # But not these files...
 !.gitignore
-!README.md
+!*README.md
 !LICENSE
 !docker-compose.yaml
 !crypto-config.yaml
