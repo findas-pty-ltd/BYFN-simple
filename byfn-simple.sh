@@ -47,6 +47,27 @@ function help(){
   echo 
 }
 
+## This function will download your platform specific binaries
+function binaryDownload() {
+      local BINARY_FILE=hyperledger-fabric-${OS_ARCH}-${VERSION}.tar.gz
+      local URL=https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/${OS_ARCH}-${VERSION}/${BINARY_FILE}
+      echo "===> Downloading: " ${URL}
+      # Check if a previous failure occurred and the file was partially downloaded
+      curl ${URL} | tar xz || rc=$?
+      rm -rf ./config
+}
+
+## This function will pull the required docker containers
+function pullContainers() {
+    IMAGE_TAG=$IMAGETAG \
+    COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME \
+    CA1_PRIVATE_KEY=$CA1_PRIVATE_KEY \
+    CA2_PRIVATE_KEY=$CA2_PRIVATE_KEY \
+    ARTIFACT_DEFAULT=$ARTIFACT_DEFAULT \
+    docker-compose -f $COMPOSE_FILE pull 2>&1
+}
+
+## This function will make sure that you are using the same version for the docker images and binnaries
 function checkPrereqs() {
   # Note, we check configtxlator externally because it does not require a config file, and peer in the
   # docker image because of FAB-8551 that makes configtxlator return 'development version' in docker

@@ -4,7 +4,7 @@ This repository aims to reduce the Hyperledger Fabric "Build Your First Netowrk"
 
 ### Repository 
 - bin
-    - Contains the compiled binanairs created by the fabric team.
+    - Contains the compiled binaries created by the fabric team.
 - configtx.yaml 
     - Contains the channel configuration - one configtx per channel. 
 - crypto-config.yaml
@@ -18,15 +18,24 @@ This repository aims to reduce the Hyperledger Fabric "Build Your First Netowrk"
 
 ### Step 1 Prep
 Install the prerequisites listed bellow
-and
-add ./bin folder to your path
+Then clone this repository by running the command.
+```sh
+$ git clone https://github.com/findas-pty-ltd/BYFN-simple byfn-simple
+$ cd byfn-simple
+```
+Once you have download the repository and are in the repository folder you can run
+```sh
+$ ./byfn-simple.sh binaryDownload
+$ ./byfn-simple.sh pullContainers
+```
+This will download the binnaries for your machine and will pull the required docker containers for the fabric network.
+Once this has completed you can add the binnaries to your path and test them by running
 ```sh
 $ export PATH=$PATH:$PWD/bin
+$ ./byfn-simple.sh checkPrereqs
 ```
-To test you should be able to run
-```sh
-$ which cryptogen
-```
+
+Now that the environment is ready we can start building the network.
 
 ### Step 2 Testing
 Run the full byfn to test if the network will boot
@@ -56,7 +65,6 @@ These include:
 - channel MSPs
 - Organisation MSPs
 - GenisisBlocks
-
  
 ```sh
 $ ./byfn-simple.sh create_channel_artifact [Output File] [Channel Name] [Profile From configtx.yaml]
@@ -100,7 +108,7 @@ Next we'll want set up our Anchor peers so run
 $ ./scripts/build-network.sh init_anchors
 ```
 This will set peer0 of org1 and peer0 of org2 as our anchor peers.
-And now you'll need to install and instaciate the chaincode by running 
+And now you'll need to install and instantiate the chaincode by running 
 ```sh
 $ ./scripts/build-network.sh init_chaincode
 ```

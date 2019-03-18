@@ -14,8 +14,6 @@
 !*/
 
 # if the files to be tracked are in subdirectories
-!*bin/configtxgen
-!*bin/cryptogen
 !*scripts/script.sh
 !*scripts/bash-settings.cfg
 !*.go
