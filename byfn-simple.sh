@@ -101,7 +101,7 @@ function checkPrereqs() {
 
 
 ##################################################
-###                 High Detail                ###
+###                 low-level (High Detail)    ###
 ##################################################
 
 ###_______________Cert_Generation______________###
@@ -290,7 +290,7 @@ function run_inner_script(){
 
 
 ##################################################
-###                  Low Detail                ###
+###                  Hi-level (Low Detail)     ###
 ##################################################
 
 # This function will execute the following steps:

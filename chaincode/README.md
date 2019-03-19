@@ -1,6 +1,6 @@
 # Chaincode
 
-This folder will be joined to the CLI container
+This folder is mapped to the CLI container
 
 
 

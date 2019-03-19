@@ -36,7 +36,7 @@ function help(){
 }
 
 ##################################################
-###                 High Detail                ###
+###                 Low-level (max detail)     ###
 ##################################################
 
 # This function will join a peer to a channel 
@@ -144,7 +144,7 @@ function instantiateChaincode() {
     set +x
   else
     set -x
-    peer chaincode instantiate -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $channel -n ${chaincode} -l ${LANGUAGE} -v 1.0 -c '{"Args":["init","a","100","b","200"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" >&log.txt
+    peer chaincode instantiate -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $channel -n ${chaincode} -l ${LANGUAGE} -v 1.0 -c '{"Args":["init","a","100","b","200"]}' -P "AND ('Org1MSP.member','Org2MSP.member')" >&log.txt
     res=$?
     set +x
   fi
@@ -221,7 +221,7 @@ function init_chaincode(){
 
 
 ##################################################
-###                  Low Detail                ###
+###                  High-level (low detail)   ###
 ##################################################
 
 
