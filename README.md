@@ -70,12 +70,11 @@ These include:
  
 ```sh
 ./byfn-simple.sh create_channel_artifact ./channel-artifacts/channel.tx mychannel TwoOrgsChannel
+./byfn-simple.sh create_genesisblock_artifact ./channel-artifacts/ mychannel TwoOrgsOrdererGenesis
 ./byfn-simple.sh create_organisation_artifact Org1MSP ./channel-artifacts/ TwoOrgsChannel
 ./byfn-simple.sh create_organisation_artifact Org2MSP ./channel-artifacts/ TwoOrgsChannel
-./byfn-simple.sh create_genisiblock_artifact ./channel-artifacts/ mychannel TwoOrgsChannel
-```
-These functions all use the configtxgen binnary
 
+```
 
 ### Step 5 Booting The Network
 
@@ -103,7 +102,7 @@ docker logs -f <container id>
 
 To Configure the network you will need to connect to the CLI container by running
 ```sh
-$ docker exec -it cli bash
+docker exec -it cli bash
 ```
 
 Now that you are in the CLI if you run the `ls` command you should be able to see these folders
@@ -153,7 +152,7 @@ Now that the network is configured and running, you can test it while connected 
 This command will execute the chaincode on peer1.org1, it will query the state of entity A which is expecting a result of 100.
 Now we can run a transaction
 ```sh
-./scripts/test-network.sh mychannel mycc 0 1 0 2
+./scripts/test-network.sh chaincodeInvoke mychannel mycc 0 1 0 2
 ```
 This will execute the chaincode on a peer and send 10 from entity A to entity B, so now A should have 90 and B should have 210
 Finally we'll want to check that our transaction was successful so we can run the query command again for entity A.
