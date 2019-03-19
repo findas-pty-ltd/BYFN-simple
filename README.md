@@ -2,11 +2,11 @@
 
 This repository aims to reduce the Hyperledger Fabric "Build Your First Netowrk" example down to its 
 simplest form. The reository also aims to break down the learning of fabric into four levels of detail. 
-The lowest detail of calling the `./byfn-simple.sh up` and the highest detail of calling the fabric 
+The lowest level, calling the `./byfn-simple.sh up` to the highest level of calling the fabric 
 binaries themselves. The Steps bellow will hopefully guide you through these levels leaving you with a
 better understanding of the step required to build your first fabric network.
 
-### In This Repository 
+### In This Dir 
 - configtx.yaml 
     - Contains the channel configuration - one configtx per channel. 
 - crypto-config.yaml
@@ -38,6 +38,14 @@ export PATH=$PATH:$PWD/bin
 ```
 
 Now that the environment is ready we can start building the network.
+
+**Note :** If you are getting permission denied error when running the script you will need to run
+```sh
+chmod 777 ./byfn-simple.sh
+chmod 777 ./scripts/test-network.sh
+chmod 777 ./scripts/build-network.sh
+chmod 777 ./scripts/utils.sh
+```
 
 ### Step 2 Testing
 Run the full byfn to test if the network will boot
@@ -71,8 +79,8 @@ These include:
 ```sh
 ./byfn-simple.sh create_channel_artifact ./channel-artifacts/channel.tx mychannel TwoOrgsChannel
 ./byfn-simple.sh create_genesisblock_artifact ./channel-artifacts/ mychannel TwoOrgsOrdererGenesis
-./byfn-simple.sh create_organisation_artifact Org1MSP ./channel-artifacts/ TwoOrgsChannel
-./byfn-simple.sh create_organisation_artifact Org2MSP ./channel-artifacts/ TwoOrgsChannel
+./byfn-simple.sh create_organisation_artifact Org1MSP ./channel-artifacts/ mychannel TwoOrgsChannel
+./byfn-simple.sh create_organisation_artifact Org2MSP ./channel-artifacts/ mychannel TwoOrgsChannel
 
 ```
 
@@ -88,11 +96,11 @@ docker ps
 ```
 There should be 6 docker containers running
 
-Note: To debug containers that did not boot run
+**Note:** To debug containers that did not boot, run
 ```sh
 docker ps -a
 ```
-You should be able to see the container that did not boot. You can then use it's container id to view it's logs
+You should be able to see the container that did not boot. You can then use it's container 'id' to view it's logs
 and hopefully figure out why it crashed
 ```sh
 docker logs -f <container id> 
@@ -136,37 +144,72 @@ And now we'll want to install chaincode onto our peers by running these 4 comman
 ./scripts/build-network.sh installChaincode 0 2
 ./scripts/build-network.sh installChaincode 1 2
 ```
-And now the chaincode has to be instantiated, this done by instantiating the chaincode on 1 peer.
+And now we want to instantiate the chaincode, this will run your Init function creating the starting state of the blockchain.
+You can view the 'Init' function [here](https://github.com/findas-pty-ltd/BYFN-simple/blob/master/chaincode/simple_chaincode.go#L37 "Location of Init Function")
 ```sh
 ./scripts/build-network.sh instantiateChaincode 0 2
 ```
-This will create 2 entities A and B, giving entity A a total of 100 and entity B a total of 200.
+This will create 2 entities, A and B, giving entity A a total of 100 tokens and entity B a total of 200 tokens.
+
 
 
 ### Step 7 Testing the network
 
-Now that the network is configured and running, you can test it while connected to the cli container by running
+Now that the network is configured and running, it is time to execute the Query function in the chaincode to make sure that our entities exist.
+This is done by running this command
 ```sh
 ./scripts/test-network.sh chaincodeQuery 0 1 100
 ```
-This command will execute the chaincode on peer1.org1, it will query the state of entity A which is expecting a result of 100.
-Now we can run a transaction
+This will execute the chaincode on peer1.org1, it will query the state of entity A which is expecting a result of 100 tokens.
+Now we can run a transaction, let's send 10 tokens from entity A to entity B
 ```sh
 ./scripts/test-network.sh chaincodeInvoke mychannel mycc 0 1 0 2
 ```
-This will execute the chaincode on a peer and send 10 from entity A to entity B, so now A should have 90 and B should have 210
-Finally we'll want to check that our transaction was successful so we can run the query command again for entity A.
+The above command is ex
+This will execute the chaincode on a peer and send 10 from entity A to entity B, so now A should have 90 and B should have 210.
+Finally we'll want to check that our transaction was successful so we can run the query command again for entity A
 ```sh
 ./scripts/test-network.sh chaincodeQuery 0 1 90
 ```
 If the query response for enity A returns a value of 90, then the transaction was successful and stored on the ledger.
 
+
 ## Prerequisites
-##### Summary
-- Docker and Docker Compose 17.06.2-ce +
-- Node.js Runtime and NPM   8.x
-- Go Programming Language   1.11.x
-- Python                    2.7  
-##### Details
+
+##### Docker 17.06.2-ce or above and Docker Compose 1.14.0 or above
+To Install Go To https://www.docker.com/get-started
+To check run
+```sh
+docker --version
+docker-compose --version
+```
+
+##### Node.js Runtime and NPM   8.x
+To Install NVM ( Node Version Manager ) Go To https://nodesource.com/blog/installing-node-js-tutorial-using-nvm-on-mac-os-x-and-ubuntu/
+To Select Version 8 Run
+```sh
+nvm use 8
+```
+
+##### Go Programming Language   1.11.x
+To Install Go To https://golang.org/dl/
+Download your platform's version of golang 
+Once you have downloaded and either installed or extracted the golang download then you will need to add the golang bin folder to your path
+```sh
+export GOPATH=/path_to_your_go_download/ # you must fill in the path to the go download
+export PATH=$PATH:$GOPATH/bin  
+```
+
+##### Python 2.7  If you are one Ubuntu 16.04
+To Install run 
+```sh
+sudo apt-get install python
+```
+To Check run
+```sh
+python --version
+```
+
+##### If you are having any problems you can also use the Hyperledger Fabric prereqs doc bellow
 https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html
 

@@ -3,7 +3,7 @@
 This folder will be joined to the CLI container
 
 
-### In This Folder
+### In This Dir
 - bash-settings.cfg
     - This file contains most of the default variables we extracted these variables into a .cfg file so the interal scripts and exteranl script could share the config.
 - build-network.sh

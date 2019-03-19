@@ -215,7 +215,7 @@ function create_genesisblock_artifact(){
   # named orderer.genesis.block or the orderer will fail to launch!
   set -x
                                                               # channel id can not be the same as the orgs 
-  configtxgen -profile ${3:-TwoOrgsOrdererGenesis} -channelID byfn-sys-channel  -outputBlock ${1:-$ARTIFACT_DEFAULT}/genesis.block
+  configtxgen -profile ${3:-TwoOrgsOrdererGenesis} -channelID byfn-sys-${2:-$CHANNEL_NAME}  -outputBlock ${1:-$ARTIFACT_DEFAULT}/genesis.block
   res=$?
   set +x
   if [ $res -ne 0 ]; then
