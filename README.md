@@ -30,22 +30,18 @@ better understanding of the steps required to build your first Fabric network.
 
 ## Prerequisites
 
-##### Docker 17.06.2-ce or above and Docker Compose 1.14.0 or above
+#### Docker 17.06.2-ce or above and Docker Compose 1.14.0 or above
 To Install Go To https://www.docker.com/get-started
-To check run
-```sh
-docker --version
-docker-compose --version
-```
 
-##### Node.js Runtime and NPM   8.x
+
+#### Node.js Runtime and NPM   8.x
 To Install NVM ( Node Version Manager ) Go To https://nodesource.com/blog/installing-node-js-tutorial-using-nvm-on-mac-os-x-and-ubuntu/
 To Select Version 8 Run
 ```sh
 nvm use 8
 ```
 
-##### Go Programming Language   1.11.x
+#### Go Programming Language   1.11.x
 To Install Go To https://golang.org/dl/
 Download your platform's version of golang 
 Once you have downloaded and either installed or extracted the golang download then you will need to add the golang bin folder to your path
@@ -54,17 +50,14 @@ export GOPATH=/path_to_your_go_download/ # you must fill in the path to the go d
 export PATH=$PATH:$GOPATH/bin  
 ```
 
-##### Python 2.7  If you are one Ubuntu 16.04
+#### Python 2.7  If you are one Ubuntu 16.04
 To Install run 
 ```sh
 sudo apt-get install python
 ```
-To Check run
-```sh
-python --version
-```
 
-##### To check you have all the prereqs
+
+#### To check you have all the prereqs
 Run the following version commands
 ```sh
 go version
@@ -75,7 +68,7 @@ docker-compose --version
 If all of these run and are the correct versions you are ready to begin the byfn-simple tutorial as outlined below
 
 
-##### If you are having any problems you can also use the Hyperledger Fabric prereqs doc below 
+#### If you are having any problems you can also use the Hyperledger Fabric prereqs doc below 
 https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html
 
 
