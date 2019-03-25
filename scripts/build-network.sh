@@ -31,7 +31,7 @@ function help(){
   echo
   echo 
   echo " To view what arguments to pars check the function header"
-  echo " inside the ./byfn.sh file"
+  echo " inside the ./scripts/build-network.sh file"
   echo 
 }
 

@@ -43,7 +43,7 @@ function help(){
   echo "  # > down "
   echo 
   echo " To view what arguments to pars check the function header"
-  echo " inside the ./byfn.sh file"
+  echo " inside the ./byfn-simple.sh file"
   echo 
 }
 
