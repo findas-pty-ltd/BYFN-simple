@@ -96,7 +96,7 @@ export PATH=$PATH:$PWD/bin
 
 The environment is now ready you can start building the network.
 
-**Note :** If you are getting permission denied error when running the script you will need to run
+**Note :** If you are getting permission denied error when running any of the scripts, you will need to run
 ```sh
 chmod 777 ./byfn-simple.sh
 chmod 777 ./scripts/test-network.sh
@@ -130,8 +130,8 @@ This function is using the cryptogen binnary to create these files
 After the certs have been generated we now need to generate the network artifacts 
 These include:
 - channel MSPs
-- Organisation MSPs
 - GenisisBlocks
+- Organisation MSPs
  
 ```sh
 ./byfn-simple.sh create_channel_artifact ./channel-artifacts/channel.tx mychannel TwoOrgsChannel
@@ -176,7 +176,7 @@ To Configure the network you will need to connect to the CLI container by runnin
 docker exec -it cli bash
 ```
 
-Once connected to the CLI container run `ls` command and you should see these folders
+Once connected to the CLI container run the `ls` command and you should see these folders
 - channel-artifacts  
 - crypto-config
 - chaincode
