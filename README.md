@@ -215,7 +215,6 @@ You can view the 'Init' function [here](https://github.com/findas-pty-ltd/BYFN-s
 This will create 2 entities, A and B, giving entity 'A' a total of 100 tokens and entity 'B' a total of 200 tokens.
 
 
-
 ### Step 7 Testing the network
 
 Now  the network is configured and running it is time to execute the Query function in the chaincode to make sure entities 'A' and 'B' exist.
