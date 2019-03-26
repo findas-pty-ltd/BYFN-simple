@@ -47,7 +47,7 @@ The first thing we need to do when configuring the network is creating a channel
 ```sh
 ./scripts/build-network.sh init_channel
 ```
-This will first create a channel called "mychannel", it will need connect all peers in our network to that channel.
+This will first create a channel called "mychannel", it will then connect all peers in our network to that channel.
 
 ### Step 5 - Anchors
 In order for our peers to be able to connect with each other, we need to set up our anchor peers
@@ -57,11 +57,11 @@ In order for our peers to be able to connect with each other, we need to set up 
 This will set peer0 of Org1 and peer0 of Org2 as our anchors
 
 ### Step 6 - Install & Instantiate chaincode
-Now it's time to setting up our chaincode on each of our peers, we do this by running
+Now it's time to set-up our chaincode on each of our peers, we do this by running
 ```sh
 ./scripts/build-network.sh init_chaincode
 ```
-This will install the chaincode on all the peers and then instantiate it on 1 of the peers, creating 2 entities, 'A' with 100 tookens and 'B' with 200 tokens.
+This will install the chaincode on all the peers and then instantiate it on 1 of the peers, creating 2 entities, 'A' with 100 tokens and 'B' with 200 tokens.
 
 ### Step 7 - Test the chaincode
 We now have our containers running, network configured and chaincode ready, we can now test the chaincode by executing a transation
