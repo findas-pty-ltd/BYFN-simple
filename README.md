@@ -2,7 +2,7 @@
 
 ## Summary
 
-This repository aims to reduce the Hyperledger Fabric tutorial "Build Your First Netowrk" down to its 
+This repository aims to reduce the Hyperledger Fabric tutorial "Build Your First Network" down to its 
 simplest form and to maximuze the learning. This repository breaks down the Fabric tutorial into four levels of detail. 
 
 1. The high level is the most simple and is called with `./byfn-simple.sh up` 
@@ -62,7 +62,7 @@ export GOPATH=/path_to_your_go_download/ # you must fill in the path to the go d
 export PATH=$PATH:$GOPATH/bin  
 ```
 
-#### Python 2.7  If you are one Ubuntu 16.04
+#### Python 2.7  If you are on Ubuntu 16.04
 
 To Install run 
 
