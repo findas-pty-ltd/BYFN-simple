@@ -4,6 +4,20 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source $DIR/bash-settings.cfg
 source $DIR/utils.sh # imports helper functions
 
+
+function help() {
+  echo ""
+  echo " ################################# "
+  echo "      Test network           "
+  echo " ################################# "
+  echo ""
+  echo " > chaincodeQuery [peer int] [org int]"
+  echo " > chaincodeInvoke [peer int] [org int]"
+  echo " > chaincodeInvoke [peer int] [org int]"
+  echo ""
+  echo " To view what arguments to pars check the function header"
+  echo " inside the ./scripts/test-network.sh file"
+}
     
 # This function will query a value on the blockchain and will check the response
 # $1 : Int     -> the id of the peer
@@ -94,15 +108,15 @@ function chaincodeInvoke() {
 }
 
 
+# This function runs a query on the blockchain 
 function test_chaincode(){
     
-    chaincodeQuery 0 1 100
+    chaincodeQuery 0 1
     chaincodeInvoke $CHANNEL_NAME $CHAINCODE_NAME 0 1 0 2
-    chaincodeQuery 1 2 90
+    chaincodeQuery 1 2
     
 }
 
 eval "$@"
 
 exit 0
-
