@@ -2,21 +2,23 @@
 *
 
 # But not these files...
-!*.gitignore
-!*README.md
-!*LICENSE
-!*docker-compose.yaml
-!*crypto-config.yaml
-!*configtx.yaml
-!*byfn-simple.sh
+!.gitignore
+!README.md
+!LICENSE
+!docker-compose.yaml
+!crypto-config.yaml
+!configtx.yaml
+!byfn-simple.sh
 
-!*scripts/build-network.sh
-!*scripts/test-network.sh
-!*scripts/bash-settings.cfg
-!*scripts/utils.sh
+!*/
 
-!*Documents/BYFN-slides-git.pdf
-!*Documents/follow-along.md
+!*/build-network.sh
+!*/test-network.sh
+!*/bash-settings.cfg
+!*/utils.sh
+
+!*/BYFN-slides-git.pdf
+!*/follow-along.md
 
 
-!*.go
+!*/*.go
