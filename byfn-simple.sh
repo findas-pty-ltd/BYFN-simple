@@ -79,6 +79,39 @@ function checkPrereqs() {
 }
 
 
+binaryDownload() {
+      local BINARY_FILE=$1
+      local URL=$2
+      echo "===> Downloading: " ${URL}
+      # Check if a previous failure occurred and the file was partially downloaded
+      curl ${URL} | tar xz || rc=$?
+      
+}
+
+binariesInstall() {
+  echo "===> Downloading version ${FABRIC_TAG} platform specific fabric binaries"
+  binaryDownload ${BINARY_FILE} https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/${ARCH}-${VERSION}/${BINARY_FILE}
+  if [ $? -eq 22 ]; then
+     echo
+     echo "------> ${FABRIC_TAG} platform specific fabric binary is not available to download <----"
+     echo
+   fi
+}
+
+function installBinnaries(){
+# if version not passed in, default to latest released version
+export VERSION=1.4.0
+# if ca version not passed in, default to latest released version
+export CA_VERSION=$VERSION
+# current version of thirdparty images (couchdb, kafka and zookeeper) released
+export THIRDPARTY_IMAGE_VERSION=0.4.14
+export ARCH=$(echo "$(uname -s|tr '[:upper:]' '[:lower:]'|sed 's/mingw64_nt.*/windows/')-$(uname -m | sed 's/x86_64/amd64/g')")
+export MARCH=$(uname -m)
+BINARY_FILE=hyperledger-fabric-${ARCH}-${VERSION}.tar.gz
+binariesInstall
+}
+
+
 ##################################################
 ###                 High Detail                ###
 ##################################################
