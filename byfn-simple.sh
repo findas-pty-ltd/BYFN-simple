@@ -71,9 +71,22 @@ function pullContainers() {
 function checkPrereqs() {
   # Note, we check configtxlator externally because it does not require a config file, and peer in the
   # docker image because of FAB-8551 that makes configtxlator return 'development version' in docker
-  LOCAL_VERSION=$([ -n "$(which configtxlator)" ] && configtxlator version | sed -ne 's/ Version: //p')
-  DOCKER_IMAGE_VERSION=$([ -n "$(which docker)" ] && docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version | sed -ne 's/ Version: //p' | head -1)
-
+  if [ -n "$(which configtxlator)" ] ; then
+      LOCAL_VERSION=$(configtxlator version | sed -ne 's/ Version: //p')
+    else
+      echo "configtxlator is not installed or the Path is not set"
+      echo "You can run: "
+      echo "./byfn-simple.sh binaryDownload"
+      echo "To install the binnaries"
+      exit 1
+  fi
+  if [ -n "$(which docker)" ] ; then 
+      DOCKER_IMAGE_VERSION=$(docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version | sed -ne 's/ Version: //p' | head -1)
+    else
+      echo "Docker is not installed or the PATH is not set"
+      exit 1
+  fi
+ 
   echo "LOCAL_VERSION=$LOCAL_VERSION"
   echo "DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
 
