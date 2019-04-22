@@ -64,8 +64,8 @@ function checkPrereqs() {
   # docker image because of FAB-8551 that makes configtxlator return 'development version' in docker
   passing=1
   if [ -n "$(which node)" ] ; then
-      NODE_VERSION=$(node -v |sed -ne 's/v//p' | sed 's/\./  /g' | awk '{print $1}')
-      echo "node is installed version:$GIT_VERSION"
+      NODE_VERSION=$(node -v |sed -ne 's/v//p')
+      echo "node is installed version:$NODE_VERSION"
     else
       echo "node is not installed or the Path is not set"
       passing=0
@@ -84,10 +84,24 @@ function checkPrereqs() {
       echo "curl is not installed or the Path is not set"
       passing=0
   fi
+  if [ -n "$(which go)" ] ; then
+      GO_VERSION=$(go version | awk '{print $3}' | sed -ne 's/go//p' | head -1 )
+      echo "go is installed version:$GO_VERSION"
+    else
+      echo "go is not installed or the Path is not set"
+      passing=0
+  fi
+  if [ -n "$(which python)" ] ; then
+      PYTHON_VERSION=$(echo $(python --version 2>&1) | awk '{print $2}')
+      echo "python is installed version:$PYTHON_VERSION"
+    else
+      echo "python is not installed or the Path is not set"
+      passing=0
+  fi
   if [ -n "$(which docker)" ] ; then 
       DOCKER_VERSION=$(docker --version | awk '{print $3}' | sed -ne 's/,//p')
       DOCKER_IMAGE_VERSION=$(sudo docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version | sed -ne 's/ Version: //p' | head -1)
-      echo "docker images are installed is installed version:$DOCKER_IMAGE_VERSION"
+      echo "docker images are installed version:$DOCKER_IMAGE_VERSION"
       echo "docker is installed version:$DOCKER_VERSION"
     else
       echo "Docker is not installed or the PATH is not set"

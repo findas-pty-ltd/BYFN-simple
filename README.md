@@ -129,6 +129,7 @@ chmod 777 ./scripts/build-network.sh
 chmod 777 ./scripts/utils.sh
 ```
 
+
 ### Step 2 Testing
 
 Run the high-level byfn-simple script to test if the network will boot
@@ -144,6 +145,14 @@ Once you have byfn running cleanly then bring it back down
 ```
 
 Now run the low-level byfn-simple script to better unerstand the build process.
+
+**Note : *** If you are getting ERROR: could not connect to docker deamon this could be becuase you need to add docker to sudo list.
+
+```sh
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+Then sign out and sign back in for these changes to take effect. This will make is so you don't need to use sudo for docker commands.
 
 ### Step 3 Certs
 
