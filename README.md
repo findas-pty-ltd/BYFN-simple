@@ -146,7 +146,7 @@ Once you have byfn running cleanly then bring it back down
 
 Now run the low-level byfn-simple script to better unerstand the build process.
 
-**Note : *** If you are getting ERROR: could not connect to docker deamon this could be becuase you need to add docker to sudo list.
+**Note : ** If you are getting ERROR: could not connect to docker deamon this could be becuase you need to add docker to sudo list.
 
 ```sh
 sudo groupadd docker
