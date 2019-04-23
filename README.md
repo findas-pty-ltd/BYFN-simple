@@ -306,3 +306,10 @@ Finally we'll want to check that our transaction was successful so we can run th
 ./scripts/test-network.sh chaincodeQuery 0 1 90
 ```
 If the query response for enity 'A' returns a value of 90, then the transaction was successful and was stored on the ledger.
+
+
+### Next Steps
+
+Now that you have a network up and running you can have a look at the chaincode and see how it work. You can also look into the `test-network.sh` to see how it interacts with the chaincode.
+
+We are working on a second tutorial that will connect an REST API to the chaincode. We will add a link here once it is ready.

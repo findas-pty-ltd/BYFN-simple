@@ -12,13 +12,17 @@
 
 !*/
 
-!*/build-network.sh
-!*/test-network.sh
-!*/bash-settings.cfg
-!*/utils.sh
-
-!*/BYFN-slides-git.pdf
-!*/follow-along.md
+!scripts/build-network.sh
+!scripts/test-network.sh
+!scripts/bash-settings.cfg
+!scripts/utils.sh
 
 
-!*/*.go
+!documents/BYFN-slides-git.pdf
+!documents/follow-along.md
+
+
+!chaincode/node/simple_chaincode.js
+!chaincode/node/package.json
+!chaincode/go/simple_chaincode.go
+
