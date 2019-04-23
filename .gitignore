@@ -3,12 +3,12 @@
 
 # But not these files...
 !.gitignore
-!README.md
 !LICENSE
 !docker-compose.yaml
 !crypto-config.yaml
 !configtx.yaml
 !byfn-simple.sh
+!README.md
 
 !*/
 
@@ -16,13 +16,13 @@
 !scripts/test-network.sh
 !scripts/bash-settings.cfg
 !scripts/utils.sh
-
+!scrips/README.md
 
 !documents/BYFN-slides-git.pdf
 !documents/follow-along.md
 
-
 !chaincode/node/simple_chaincode.js
 !chaincode/node/package.json
 !chaincode/go/simple_chaincode.go
+!chaincode/README.md
 

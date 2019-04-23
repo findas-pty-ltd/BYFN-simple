@@ -121,7 +121,7 @@ function checkPrereqs() {
     else
       echo "configtxlator is not installed or the Path is not set"
       echo "You can run: "
-      echo "./byfn-simple.sh installBinnaries"
+      echo "./byfn-simple.sh installBinaries"
       echo "To install the binnaries"
       passing=0
   fi
@@ -161,18 +161,7 @@ binaryDownload() {
       curl ${URL} | tar xz || rc=$?
       
 }
-
-binariesInstall() {
-  echo "===> Downloading version ${FABRIC_TAG} platform specific fabric binaries"
-  binaryDownload ${BINARY_FILE} https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/${ARCH}-${VERSION}/${BINARY_FILE}
-  if [ $? -eq 22 ]; then
-     echo
-     echo "------> ${FABRIC_TAG} platform specific fabric binary is not available to download <----"
-     echo
-   fi
-}
-
-function installBinnaries(){
+function installBinaries(){
 # if version not passed in, default to latest released version
 export VERSION=1.4.0
 # if ca version not passed in, default to latest released version
@@ -182,7 +171,13 @@ export THIRDPARTY_IMAGE_VERSION=0.4.14
 export ARCH=$(echo "$(uname -s|tr '[:upper:]' '[:lower:]'|sed 's/mingw64_nt.*/windows/')-$(uname -m | sed 's/x86_64/amd64/g')")
 export MARCH=$(uname -m)
 BINARY_FILE=hyperledger-fabric-${ARCH}-${VERSION}.tar.gz
-binariesInstall
+echo "===> Downloading version ${FABRIC_TAG} platform specific fabric binaries"
+  binaryDownload ${BINARY_FILE} https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/${ARCH}-${VERSION}/${BINARY_FILE}
+  if [ $? -eq 22 ]; then
+     echo
+     echo "------> ${FABRIC_TAG} platform specific fabric binary is not available to download <----"
+     echo
+   fi
 }
 
 
