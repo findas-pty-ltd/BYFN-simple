@@ -47,20 +47,12 @@ function help(){
   echo 
 }
 
-## This function will download your platform specific binaries
-function binaryDownload() {
-      local BINARY_FILE=hyperledger-fabric-${OS_ARCH}-${VERSION}.tar.gz
-      local URL=https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/${OS_ARCH}-${VERSION}/${BINARY_FILE}
-      echo "===> Downloading: " ${URL}
-      # Check if a previous failure occurred and the file was partially downloaded
-      curl ${URL} | tar xz || rc=$?
-      rm -rf ./config
-}
 
 ## This function will pull the required docker containers
 function pullContainers() {
     IMAGE_TAG=$IMAGETAG \
     COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME \
+    CHAINCODE_PATH=$CHAINCODE_PATH \
     CA1_PRIVATE_KEY=$CA1_PRIVATE_KEY \
     CA2_PRIVATE_KEY=$CA2_PRIVATE_KEY \
     ARTIFACT_DEFAULT=$ARTIFACT_DEFAULT \
@@ -71,24 +63,72 @@ function pullContainers() {
 function checkPrereqs() {
   # Note, we check configtxlator externally because it does not require a config file, and peer in the
   # docker image because of FAB-8551 that makes configtxlator return 'development version' in docker
+  passing=1
+  if [ -n "$(which node)" ] ; then
+      NODE_VERSION=$(node -v |sed -ne 's/v//p')
+      echo "node is installed version:$NODE_VERSION"
+    else
+      echo "node is not installed or the Path is not set"
+      passing=0
+  fi
+  if [ -n "$(which git)" ] ; then
+      GIT_VERSION=$(git --version | sed -ne 's/git version //p')
+      echo "git is installed version:$GIT_VERSION"
+    else
+      echo "git is not installed or the Path is not set"
+      passing=0
+  fi
+  if [ -n "$(which curl)" ] ; then
+      CURL_VERSION=$(curl -V | awk '{print $2}' | head -1 )
+      echo "curl is installed version:$CURL_VERSION"
+    else
+      echo "curl is not installed or the Path is not set"
+      passing=0
+  fi
+  if [ -n "$(which go)" ] ; then
+      GO_VERSION=$(go version | awk '{print $3}' | sed -ne 's/go//p' | head -1 )
+      echo "go is installed version:$GO_VERSION"
+    else
+      echo "go is not installed or the Path is not set"
+      passing=0
+  fi
+  if [ -n "$(which python)" ] ; then
+      PYTHON_VERSION=$(echo $(python --version 2>&1) | awk '{print $2}')
+      echo "python is installed version:$PYTHON_VERSION"
+    else
+      echo "python is not installed or the Path is not set"
+      passing=0
+  fi
+  if [ -n "$(which docker)" ] ; then 
+      DOCKER_VERSION=$(docker --version | awk '{print $3}' | sed -ne 's/,//p')
+      DOCKER_IMAGE_VERSION=$(sudo docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version | sed -ne 's/ Version: //p' | head -1)
+      echo "docker images are installed version:$DOCKER_IMAGE_VERSION"
+      echo "docker is installed version:$DOCKER_VERSION"
+    else
+      echo "Docker is not installed or the PATH is not set"
+      passing=0
+  fi
+  if [ -n "$(which docker-compose)" ] ; then 
+      DOCKER_COMPOSE_VERSION=$(docker-compose --version | awk '{print $3}' | sed -ne 's/,//p')
+      echo "docker-compose is installed version:$DOCKER_COMPOSE_VERSION"
+    else
+      echo "docker-compose is not installed or the PATH is not set"
+      passing=0
+  fi
   if [ -n "$(which configtxlator)" ] ; then
       LOCAL_VERSION=$(configtxlator version | sed -ne 's/ Version: //p')
+      echo "configtxlator is installed version:$LOCAL_VERSION"
     else
       echo "configtxlator is not installed or the Path is not set"
       echo "You can run: "
-      echo "./byfn-simple.sh binaryDownload"
+      echo "./byfn-simple.sh installBinaries"
       echo "To install the binnaries"
-      exit 1
+      passing=0
   fi
-  if [ -n "$(which docker)" ] ; then 
-      DOCKER_IMAGE_VERSION=$(docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version | sed -ne 's/ Version: //p' | head -1)
-    else
-      echo "Docker is not installed or the PATH is not set"
-      exit 1
+  if [ $passing -eq 0 ] ; then
+    echo "There are missing Prereqs Exiting"
+    exit 1
   fi
- 
-  echo "LOCAL_VERSION=$LOCAL_VERSION"
-  echo "DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
 
   if [ "$LOCAL_VERSION" != "$DOCKER_IMAGE_VERSION" ]; then
     echo "=================== WARNING ==================="
@@ -121,18 +161,7 @@ binaryDownload() {
       curl ${URL} | tar xz || rc=$?
       
 }
-
-binariesInstall() {
-  echo "===> Downloading version ${FABRIC_TAG} platform specific fabric binaries"
-  binaryDownload ${BINARY_FILE} https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/${ARCH}-${VERSION}/${BINARY_FILE}
-  if [ $? -eq 22 ]; then
-     echo
-     echo "------> ${FABRIC_TAG} platform specific fabric binary is not available to download <----"
-     echo
-   fi
-}
-
-function installBinnaries(){
+function installBinaries(){
 # if version not passed in, default to latest released version
 export VERSION=1.4.0
 # if ca version not passed in, default to latest released version
@@ -142,7 +171,13 @@ export THIRDPARTY_IMAGE_VERSION=0.4.14
 export ARCH=$(echo "$(uname -s|tr '[:upper:]' '[:lower:]'|sed 's/mingw64_nt.*/windows/')-$(uname -m | sed 's/x86_64/amd64/g')")
 export MARCH=$(uname -m)
 BINARY_FILE=hyperledger-fabric-${ARCH}-${VERSION}.tar.gz
-binariesInstall
+echo "===> Downloading version ${FABRIC_TAG} platform specific fabric binaries"
+  binaryDownload ${BINARY_FILE} https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/${ARCH}-${VERSION}/${BINARY_FILE}
+  if [ $? -eq 22 ]; then
+     echo
+     echo "------> ${FABRIC_TAG} platform specific fabric binary is not available to download <----"
+     echo
+   fi
 }
 
 
@@ -322,6 +357,7 @@ function boot_containers(){
     echo boot_containers
     IMAGE_TAG=$IMAGETAG \
     COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME \
+    CHAINCODE_PATH=$CHAINCODE_PATH \
     CA1_PRIVATE_KEY=$CA1_PRIVATE_KEY \
     CA2_PRIVATE_KEY=$CA2_PRIVATE_KEY \
     ARTIFACT_DEFAULT=$ARTIFACT_DEFAULT \
@@ -362,6 +398,7 @@ function down(){
     echo docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_ORG3 down --volumes --remove-orphans
     IMAGE_TAG=$IMAGETAG \
     COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME \
+    CHAINCODE_PATH=$CHAINCODE_PATH \
     CA1_PRIVATE_KEY=$CA1_PRIVATE_KEY \
     CA2_PRIVATE_KEY=$CA2_PRIVATE_KEY \
     ARTIFACT_DEFAULT=$ARTIFACT_DEFAULT \

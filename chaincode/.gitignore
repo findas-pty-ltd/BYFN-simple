@@ -1,0 +1,16 @@
+*
+
+
+!/.gitignore
+!/package.json
+!/tsconfig.json
+!/.eslintrc.yaml
+!/README.md
+
+!*/
+
+!/src/main.ts
+!/src/demo.ts
+!/src/test.spec.ts
+
+

@@ -1,9 +1,18 @@
-# Chaincode
-
-This folder is mapped to the CLI container
 
 
+###you will need to run the folloning commands
 
-### In This Dir
-- simple_chaincode.go
-    - This file contains the chaincode, this is the file that is executed during transactions and queries.
+```sh
+npm install -g tsc
+```
+
+###to compile
+```sh
+npm run build
+```
+
+###to run
+```sh
+npm start
+```
+

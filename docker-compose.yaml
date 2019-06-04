@@ -250,7 +250,7 @@ services:
     command: /bin/bash
     volumes:
         - /var/run/:/host/var/run/
-        - ./chaincode/:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode/
+        - $CHAINCODE_PATH:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode/
         - ./crypto-config/:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto-config/
         - ./scripts/:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
         - ${ARTIFACT_DEFAULT}:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/

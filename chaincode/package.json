@@ -1,0 +1,39 @@
+{
+  "name": "simple_chaincode",
+  "version": "1.0.0",
+  "description": "simple_chaincode chaincode implemented in node.js",
+  "engines": {
+    "node": ">=8.4.0",
+    "npm": ">=5.3.0"
+  },
+  "scripts": {
+    "start": "node ./dist/main.js",
+    "build": "tsc",
+    "watch-ts": "tsc-watch --onSuccess \"mocha ./dist/test.spec.js \""
+  },
+  "engine-strict": true,
+  "license": "Apache-2.0",
+  "dependencies": {
+    "fabric-shim": "~1.4.0"
+  },
+  "devDependencies": {
+    "@theledger/fabric-mock-stub": "^4.0.0",
+    "@theledger/fabric-shim-crypto-types": "^1.0.4",
+    "@theledger/fabric-shim-types": "^2.0.7",
+    "@types/chai": "^4.1.2",
+    "@types/express-serve-static-core": "4.0.49",
+    "@types/mocha": "^2.2.48",
+    "@types/node": "^8.5.8",
+    "@types/winston": "^2.3.8",
+    "@types/yup": "^0.24.1",
+    "chai": "^4.1.2",
+    "mocha": "^4.1.0",
+    "npm": "^6.9.0",
+    "npm-watch": "^0.6.0",
+    "ts-jest": "^22.0.4",
+    "ts-node": "^5.0.0",
+    "tsc-watch": "^2.2.0",
+    "tslint": "^5.9.1",
+    "typescript": "~3.4.5"
+  }
+}

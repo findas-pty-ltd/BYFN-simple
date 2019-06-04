@@ -129,6 +129,7 @@ chmod 777 ./scripts/build-network.sh
 chmod 777 ./scripts/utils.sh
 ```
 
+
 ### Step 2 Testing
 
 Run the high-level byfn-simple script to test if the network will boot
@@ -144,6 +145,14 @@ Once you have byfn running cleanly then bring it back down
 ```
 
 Now run the low-level byfn-simple script to better unerstand the build process.
+
+**Note :** If you are getting ERROR: could not connect to docker deamon this could be becuase you need to add docker to sudo list.
+
+```sh
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+Then sign out and sign back in for these changes to take effect. This will make is so you don't need to use sudo for docker commands.
 
 ### Step 3 Certs
 
@@ -297,3 +306,10 @@ Finally we'll want to check that our transaction was successful so we can run th
 ./scripts/test-network.sh chaincodeQuery 0 1 90
 ```
 If the query response for enity 'A' returns a value of 90, then the transaction was successful and was stored on the ledger.
+
+
+### Next Steps
+
+Now that you have a network up and running you can have a look at the chaincode and see how it work. You can also look into the `test-network.sh` to see how it interacts with the chaincode.
+
+We are working on a second tutorial that will connect an REST API to the chaincode. We will add a link here once it is ready.
