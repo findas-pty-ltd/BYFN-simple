@@ -42,11 +42,11 @@ describe('Sym Supply Chain', () => {
         let gpu1 = {
             id: "gpu1",
             type: "RTX2080Ti",
-            owner: "buz-1"
+            owner: "buz-2"
         }
         let gpu2 = {
             id: "gpu2",
-            type: "RTX2080Ti",
+            type: "GTX1080Ti",
             owner: "buz-2"
         }
         let gpu3 = {
@@ -84,13 +84,13 @@ describe('Sym Supply Chain', () => {
         expect(JSON.parse(response.payload.toString())).to.deep.eq(buz2);
 
         console.log("Creating GPU 1");
-        response = await stub.mockInvoke(_.tx(), ["createGPU", "gpu1", "RTX2080Ti", "buz-1"])
+        response = await stub.mockInvoke(_.tx(), ["createGPU", "gpu1", "RTX2080Ti", "buz-2"])
         expect(response.status).to.eql(200);
         response = await stub.mockInvoke(_.tx(),["getGPU" , "gpu1"]);
         expect(JSON.parse(response.payload.toString())).to.deep.eq(gpu1);
 
         console.log("Creating GPU 1");
-        response = await stub.mockInvoke(_.tx(), ["createGPU", "gpu2", "RTX2080Ti", "buz-2"])
+        response = await stub.mockInvoke(_.tx(), ["createGPU", "gpu2", "GTX1080Ti", "buz-2"])
         expect(response.status).to.eql(200);
         response = await stub.mockInvoke(_.tx(),["getGPU" , "gpu2"]);
         expect(JSON.parse(response.payload.toString())).to.deep.eq(gpu2);
@@ -112,7 +112,7 @@ describe('Sym Supply Chain', () => {
             owner: "buz-1"
         }
 
-        var response = await stub.mockInvoke(_.tx(), ["createOrder", "order1", "buz-1", "buz-2", "orderline1", "GTX1080Ti", "1"])
+        var response = await stub.mockInvoke(_.tx(), ["createOrder", "order1", "buz-1", "buz-2", "orderline1", "GTX1080Ti", "2"])
         expect(response.status).to.eql(200);
 
         var response = await stub.mockInvoke(_.tx(), ["getOrder", "order1"])
@@ -120,7 +120,7 @@ describe('Sym Supply Chain', () => {
     });
 
     it("Fill Order", async() => {
-        var response = await stub.mockInvoke(_.tx(), ['fillOrder', 'order1', 'orderline1', 'gpu3'])
+        var response = await stub.mockInvoke(_.tx(), ['fillOrder', 'order1', 'orderline1', 'gpu3', 'gpu2'])
         expect(response.status).to.eq(200);
     });
 
@@ -143,7 +143,6 @@ describe('Sym Supply Chain', () => {
         var response = await stub.mockInvoke(_.tx(), ["progressOrder", "order1", "COMPLETED", "true"])
         expect(response.status).to.eq(200);
     });
-
 
     it("Sell GPU", async() => {
         var response = await stub.mockInvoke(_.tx(), ["sellGpu", "gpu3","cust1"])

@@ -54,7 +54,7 @@ interface Order {
     to:string;
     from:string;
     state: OrderState;
-    owner: string 
+    owner: string;
 }
 
 interface LineItem {
@@ -124,6 +124,8 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
         }
         return stub.putState(buz.id,Buffer.from(JSON.stringify(buz)));
     }
+
+
     async createGPU(stub: shim.ChaincodeStub, args: string[]): Promise<void> {
         console.log("creating GPU");
         hlp.checkArgs(args, 3);
@@ -169,7 +171,7 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
         let lineitemdata = args.slice(3,);
         let lineitemcount = lineitemdata.length/lineitemlenth;
         var lineitems: LineItem[] = [];
-        
+
         for (var _i = 0; _i < lineitemcount; _i++) {
             let startindex = _i * lineitemlenth;
             lineitems.push({
@@ -265,10 +267,8 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
                             console.log("about to put state"+ JSON.stringify(object))
                             let res = await stub.putState(object.id , Buffer.from(JSON.stringify(object)));
                         }
-                    }).then(async (resp)=>{
-                        await this.deleteState(stub, [order.id])
                     })
-                });
+                })
                 await Promise.all(status);
                 return;
             }
@@ -284,29 +284,29 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
         var order = JSON.parse((await stub.getState(orderid)).toString('utf8'));
         var lineitem = JSON.parse((await stub.getState(lineItemId)).toString('utf8'));
         var promises: Promise<void>[] = []
-
+        var currentID  = itemIDs[0];
+        console.log(itemIDs)
         for ( let gpuId of itemIDs){
             var gpu = JSON.parse((await stub.getState(gpuId)).toString());
+            console.log(gpu.id)
             if (gpu.type !== lineitem.gpu) {
                 //will not add this gpu to the line item
-                console.log("Type Error: gpu:"+gpuId+":"+gpu.type+"  does not match type lineitem:"+lineitem.id+":"+lineitem.gpu);
+                console.log("Type Error: gpu: "+gpuId+" : "+gpu.type+"  does not match type lineitem: "+lineitem.id+" : "+lineitem.gpu);
                 break;
             }
             gpu.owner = lineitem.id;
-            promises.push(
-                this.updateIndex(stub,'tree',[order.from,gpu.id],[order.to,order.id,lineitem.id,gpu.id])
-                .then( resp => {
-                    stub.putState(gpu.id, Buffer.from(JSON.stringify(gpu)))
-                })
-                .catch( err => {
-                    console.log(err);
-                })
-            );
+            
+            await this.updateIndex(stub,'tree',[order.from,gpu.id],[order.to,order.id,lineitem.id,gpu.id])
+            .then(async(resp) => {
+                await stub.putState(gpu.id, Buffer.from(JSON.stringify(gpu)))
+            }).catch( err => {
+                console.log(err);
+            })
+            
         }
-        return Promise.all(promises)
-        .then(res => {
-            return this.progressOrder(stub, [orderid,OrderState.toString(OrderState.APPROVED),"true"])
-        });
+       
+        return this.progressOrder(stub, [orderid,OrderState.toString(OrderState.APPROVED),"true"])
+        
     }
 
     async sellGpu(stub: shim.ChaincodeStub, args: string[] ): Promise<void> {
@@ -453,6 +453,51 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
         });
         
     }
+
+    
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+    
+
+
+
 
     
 
