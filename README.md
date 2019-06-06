@@ -1,17 +1,17 @@
 # byfn-simple
 
-If you have not completed `tutorial-01` we suggest going back and at lease get the network running. 
+If you have not completed `tutorial-01` we suggest going back and at least get the network running. 
 ``` sh
-./bynf-simple.sh up
+./byfn-simple.sh up
 ```
-This is will be required to deploy you chaincode to the network. 
+This will be required to deploy your chaincode to the network. 
 
 If you only want to play with some chaincode then it is not required that you have this running. 
 
 ## Tutorial-02
 In this tutorial we will be running and testing typescript chaincode both on the network and using a Mock Stub.
 
-Once you have clone this repo and have it locally check that you are on the `tutorial-02` branch. 
+Once you have cloned this repo and have it locally, check that you are on the `tutorial-02` branch. 
 
 ### 1) Running the Mock Stub
 
@@ -30,7 +30,7 @@ npm run watch-ts
 
 You now have the chaincode in `/chaincode/src/demo.ts` running using a mock stub. Try adding an extra `console.log("<your name>")` at the start of the Invoke function. Once you save it the test should run again and you should be able to see your name in the outputs. 
 
-You can now quickly experiment with chaincode. And create scenarios in the `/chaincode/src/test.spec.ts` to test your chaincode.
+You can now quickly experiment with chaincode and create scenarios in the `/chaincode/src/test.spec.ts` to test your chaincode.
 
 ### 2) Install the chaincode
 

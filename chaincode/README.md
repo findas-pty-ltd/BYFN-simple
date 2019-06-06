@@ -1,6 +1,6 @@
 # Chaincode
 
-This chaincode project aims to simulate a simple supply chain example. We explore how to store objects and some business logic on the ledger with this chaincode. We have also configured the chaincode to work with a mock stub. This means you will not have to run a hyperledger network to test you chaincodeing skills.
+This chaincode project aims to simulate a simple supply chain example. We explore how to store objects and some business logic on the ledger with this chaincode. We have also configured the chaincode to work with a mock stub. This means you will not have to run a hyperledger network to test your chaincoding skills.
 
 
 # Key Files
@@ -16,7 +16,7 @@ This file initiates the mock stub and will run a sequence on chaincode functions
 - Initializing the network objects
 - Org1 Creates an order for 2 GPUs
 - Org2 fills the order from their stock
-- The order progress through a sequence of states "TRANSPORT" "DELIVERED"
+- The order progress through a sequence of states "TRANSIT" "DELIVERED"
 - Org2 sells the gpu to a customer.
 
 Once the simulation is complete we look at the history of one of the GPU's. This lets us see all the states of the gpu. The states include all the previous owners of the gpu. 
