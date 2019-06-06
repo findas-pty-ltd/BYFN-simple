@@ -7,7 +7,6 @@ import { expect } from "chai";
 
 const chaincode = new SupplyChainCode();
 
-let stubWithInit;
 
 class _ {
     static counter: number = 0;
@@ -20,7 +19,6 @@ class _ {
 describe('Sym Supply Chain', () => {
     const stub = new ChaincodeMockStub("MyMockStub", chaincode);
 
-
     it("Initializing network", async () => {
         let buz1 = {
             name: "HolyTech",
@@ -30,6 +28,7 @@ describe('Sym Supply Chain', () => {
             name: "Gpu Land",
             id  : "buz-2"
         }
+
         let gpuType1 = {
             id: "GTX1080Ti",
             price: 700
@@ -161,8 +160,6 @@ describe('Sym Supply Chain', () => {
         console.log(str)
         expect(response.status).to.eq(200);
     });
-
-    
   
 })
 

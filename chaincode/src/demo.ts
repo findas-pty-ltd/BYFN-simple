@@ -1,7 +1,4 @@
 import * as shim from 'fabric-shim';
-import { getCiphers } from 'tls';
-import { resolve } from 'url';
-import { date } from 'yup';
 
 enum OrderState {
     FAILED=-1,
@@ -67,6 +64,7 @@ interface LineItem {
 
 class hlp {
     static checkArgs(args: any[], length: number, groupsize: number = 0 , groupcount: number = 0 ) {
+        // This function is used to validate parsed arguments
         // positive numbers will require in the variable needing to be equal
         // negative numbers will require the variable to be greater than or equal to 
         let mainargs = args;
@@ -93,9 +91,7 @@ class hlp {
         if( groupsize > 0 && groupcount < 0 && ( varargs.length / groupsize ) <=  groupcount ) {
             throw new Error("ERROR: Incorrect number of args. varargs.length ("+varargs.length+") needs to have a group size of "+groupsize+" and more than "+groupcount+" groups");
         }
-    }
-
-    
+    }  
 }
 
 export class SupplyChainCode implements shim.ChaincodeInterface {
@@ -116,6 +112,7 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
         console.log("Creating GPU type settings :"+args);
         return stub.putState(gpuType.id,Buffer.from(JSON.stringify(gpuType)));
     }
+
     async createBusiness(stub: shim.ChaincodeStub, args: string[] ): Promise<void> {
         hlp.checkArgs(args,2);
         let buz: Business = {
@@ -124,7 +121,6 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
         }
         return stub.putState(buz.id,Buffer.from(JSON.stringify(buz)));
     }
-
 
     async createGPU(stub: shim.ChaincodeStub, args: string[]): Promise<void> {
         console.log("creating GPU");
@@ -203,8 +199,6 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
         return null;
     }
 
-
-
     /* The progressOrder() function is for updating the state of an order
 
         It accepts 3 arguments inside the args[]:
@@ -241,18 +235,13 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
                 }else{
                     newowner = order.from;
                 }
-                var queryString = {
-                    selector: {
-                        owner: order.id
-                    }
-                }
-                let currentIndexs: string[][] = JSON.parse((await this.getIndex(stub,['tree' , order.to , order.id])).toString());
+
+                let currentIndexs: string[][] = JSON.parse((await this.getIndex(stub,['tree' , order.to , order.id])).toString('utf8'));
 
                 console.log("current indexes: ", currentIndexs);
                 let current_indexes: string[][] = currentIndexs.filter(x => { return x.length >= 4});
                 console.log("current indexes: ", current_indexes);
-                let status = current_indexes.map(index => {
-                    
+                let status = current_indexes.map(index => {    
                     var newindex = index.slice(3,);
                     newindex.unshift(newowner);
                     console.log("old index: ", index, " new index: ", newindex)
@@ -261,7 +250,7 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
                         if (index.length===4) { 
                             console.log("updaing owner of "+index[3]+ " to be "+ newowner);
                             let rootProductKey =  index[3];
-                            let object = JSON.parse((await stub.getState(rootProductKey)).toString());
+                            let object = JSON.parse((await stub.getState(rootProductKey)).toString('utf8'));
                             console.log("about to put state"+ JSON.stringify(object))
                             object.owner = newowner;
                             console.log("about to put state"+ JSON.stringify(object))
@@ -277,41 +266,39 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
     }
 
     async fillOrder(stub: shim.ChaincodeStub, args: string[]): Promise<void> {
-        
         var orderid = args[0];
         var lineItemId = args[1];
-        var itemIDs = args.splice(2); // the remainder of items are items that will fill the line item
+
+        // The remainder of items are items that will fill the line item
+        var itemIDs = args.splice(2); 
+
+        // Loads the order and lineitem object from the ledger
         var order = JSON.parse((await stub.getState(orderid)).toString('utf8'));
         var lineitem = JSON.parse((await stub.getState(lineItemId)).toString('utf8'));
-        var promises: Promise<void>[] = []
-        var currentID  = itemIDs[0];
-        console.log(itemIDs)
+    
+        // Loops of the gpu ids and adds them to the line item
         for ( let gpuId of itemIDs){
-            var gpu = JSON.parse((await stub.getState(gpuId)).toString());
+            var gpu = JSON.parse((await stub.getState(gpuId)).toString('utf8'));
             console.log(gpu.id)
             if (gpu.type !== lineitem.gpu) {
-                //will not add this gpu to the line item
+                // Will not add this gpu to the line item if it does not match the line item type
                 console.log("Type Error: gpu: "+gpuId+" : "+gpu.type+"  does not match type lineitem: "+lineitem.id+" : "+lineitem.gpu);
                 break;
             }
-            gpu.owner = lineitem.id;
-            
+            gpu.owner = lineitem.id; 
             await this.updateIndex(stub,'tree',[order.from,gpu.id],[order.to,order.id,lineitem.id,gpu.id])
-            .then(async(resp) => {
-                await stub.putState(gpu.id, Buffer.from(JSON.stringify(gpu)))
+            .then(async () => {
+                return await stub.putState(gpu.id, Buffer.from(JSON.stringify(gpu)))
             }).catch( err => {
                 console.log(err);
-            })
-            
+            });   
         }
-       
-        return this.progressOrder(stub, [orderid,OrderState.toString(OrderState.APPROVED),"true"])
-        
+        return this.progressOrder(stub, [orderid,OrderState.toString(OrderState.APPROVED),"true"]) 
     }
 
     async sellGpu(stub: shim.ChaincodeStub, args: string[] ): Promise<void> {
         hlp.checkArgs(args,2);
-        console.log("Selling GPU "+ args)
+        
         let gpuId  = args[0];
         let custId = args[1];  //----- maybe create a generic customer----- maybe create a generic customer
         const bufferObj = await stub.getState(gpuId);
@@ -327,8 +314,6 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
      
     }
 
-
-    
     async getIndex(stub:shim.ChaincodeStub, args: string[] ): Promise<Buffer> {
         hlp.checkArgs(args, -1);
         var objectType = args[0]
@@ -375,14 +360,14 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
         var done = false
         do{    
             const data = await iter.next();
-            var a = new Date(data.value.timestamp.getNanos())
             done = data.done;
             try{
                 let res = {
+                    // This is meta data that is attached to every transaction provided by fabric
                     // "meta_data":{
                     //     "timestamp": (a.toDateString() + " " + a.toTimeString()),
-                    //     "is_deleted": data.value.is_delete.toString(),
-                    //     "tx_id": data.value.tx_id.toString()
+                    //     "is_deleted": data.value.is_delete.toString('utf8'),
+                    //     "tx_id": data.value.tx_id.toString('utf8')
                     // },
                     "data": JSON.parse(data.value.value.toString('utf8'))
                 }
@@ -453,55 +438,6 @@ export class SupplyChainCode implements shim.ChaincodeInterface {
         });
         
     }
-
-    
-
-
-
-
-    
-
-
-
-
-    
-
-
-
-
-    
-
-
-
-
-    
-
-
-
-
-    
-
-
-
-
-    
-
-
-
-
-    
-
-
-
-
-    
-
-
-
-
-    
-
-
 
     async Invoke(stub: shim.ChaincodeStub): Promise<shim.ChaincodeResponse> {
         let ret = stub.getFunctionAndParameters();
